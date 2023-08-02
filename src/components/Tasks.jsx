@@ -1,36 +1,42 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { ProjectContext } from "../contexts/AppContext";
 
 export default function Tasks() {
   const taskName = useRef();
   const hours = useRef();
+  const [err, setErr] = useState(false);
   const { setShowTasks, projects, showTasks, addTaskToProject } =
     useContext(ProjectContext);
-  //
-  //
   const handleTasksAdd = (project) => {
     if (project.projNameValue.trim() !== "") {
-      addTaskToProject(
-        project.uid,
-        taskName.current.value,
-        hours.current.value
-      );
+      if (
+        !isNaN(parseFloat(hours.current.value)) &&
+        taskName.current.value.trim() !== ""
+      ) {
+        setErr(false);
+        addTaskToProject(
+          project.uid,
+          taskName.current.value.trim(),
+          hours.current.value
+        );
+        taskName.current.value = "";
+        hours.current.value = "";
+      } else {
+        setErr(true);
+      }
     }
-    taskName.current.value = "";
-    hours.current.value = "";
   };
   return (
-    <div className="relative my-7 bg-gray-800 p-5 rounded-md shadow">
+    <div className="relative bg-gray-800 p-5 rounded-md shadow">
       <button
         type="button"
         onClick={() => setShowTasks("")}
-        className="absolute -top-10 right-0 bg-white text-black px-2 py-1 font-bold"
+        className="absolute -top-10 right-0 rounded bg-gray-300 shadow text-black px-2 py-1 font-bold"
       >
         Close
       </button>
-      <h4 className="text-2xl mb-2">Tasks for {showTasks.projNameValue}</h4>
-
-      <div className="text-sm space-x-2 my-5">
+      <h4 className="text-3xl font-semibold mb-2">{showTasks.projNameValue}</h4>
+      <div className="text-sm flex flex-wrap gap-2 my-5">
         <input
           ref={taskName}
           type="text"
@@ -43,6 +49,7 @@ export default function Tasks() {
           placeholder="Time Taken in Hours"
           className="bg-transparent border p-2"
         />
+
         <button
           onClick={() => handleTasksAdd(showTasks)}
           type="button"
@@ -51,7 +58,11 @@ export default function Tasks() {
           New Task
         </button>
       </div>
-
+      {err && (
+        <div className="bg-red-200 rounded-lg text-red-500 font-semibold text-center p-2">
+          Please Recheck the Values
+        </div>
+      )}
       {projects.map((project, index) => {
         if (project.uid === showTasks.uid) {
           return (

@@ -9,21 +9,24 @@ export default function CreateProject() {
   const { addProject, projects, showTasks } = useContext(ProjectContext);
 
   const handleAddProject = () => {
-    const value = {
-      projNameValue: projName.current.value,
-      tasks: [],
-      uid: uuidv4(),
-    };
-    addProject(value);
-    projName.current.value = "";
+    if (projName.current.value.trim() != "") {
+      const value = {
+        projNameValue: projName.current.value.trim(),
+        tasks: [],
+        uid: uuidv4(),
+      };
+      addProject(value);
+      projName.current.value = "";
+    }
   };
   return (
     <>
       <section className="my-10 p-5">
         <div className="flex justify-between items-center">
           <h1 className="text-4xl">Projects</h1>
-          <div className="text-sm space-x-2">
+          <div className="text-sm">
             <input
+              placeholder="New Project Name"
               ref={projName}
               type="text"
               className="bg-transparent border p-2"
@@ -40,12 +43,12 @@ export default function CreateProject() {
       </section>
       {/* List of projects */}
       <section className="grid grid-cols-2 gap-10 p-5">
-        <div className="my-5 max-w-md">
+        <div className="my-5">
           {projects.map((project, index) => {
             return <ProjListComponent project={project} key={index} />;
           })}
         </div>
-        {showTasks ? <Tasks /> : <></>}
+        <div className="my-7">{showTasks ? <Tasks /> : <></>}</div>
       </section>
     </>
   );
